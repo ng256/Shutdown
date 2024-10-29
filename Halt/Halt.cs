@@ -1,35 +1,13 @@
 /***********************************************************
 This   program  demonstrates    a  method  to    initiate  a
-system  shutdown  on Windows  by   adjusting  the  process's
+system  shutdown  on  Windows  by  adjusting  the  process's
 privileges  to  enable     the required  shutdown privilege.
 It   first  retrieves  the  current   process's    token and
 elevates  its  privileges  by enabling "SeShutdownPrivilege"
 using native  Windows API calls.  Once   the  privilege   is
 granted,   the  program  attempts  to   initiate   a  system
 shutdown.
-
-
-Key API functions used:                                                               
-  -  OpenProcessToken:   Opens  the  token  associated  with  
-     the  current process.       
-  -  LookupPrivilegeValue:   Retrieves    the    LUID    for  
-     the   specified   privilege.  
-  -  AdjustTokenPrivileges:   Enables   the   privilege   in 
-     the  process's token.        
-  -  ExitWindowsEx:   Initiates   a  shutdown   or   restart  
-     of  the system.              
-                                                                                         
-  If   any  privilege-related   function  fails,  an   error
-  message  is  displayed using the MessageBox function,  and 
-  the program exits with a non-zero status.          
-                                                                                         
-  Note:                                                                                  
-  - The program  requires  Administrator  rights  to  adjust 
-    privileges and initiate a        
-    system shutdown.                                                                    
-  - Misuse of this code can cause unintended  shutdowns,  so 
-    use with caution.            
-                                                                                         
+                                                                                   
 Distributed under MIT License:                             
 
 Copyright (c) 2024 Pavel Bashkardin
@@ -43,11 +21,9 @@ distribute,    sublicense,    and/or   sell  copies   of the
 Software,  and  to   permit  persons  to   whom the Software
 is furnished to  do so, subject to the following conditions:
 
-
 The  above  copyright  notice  and  this  permission  notice
 shall  be included in  all copies or substantial portions of
-the                                                Software.
-
+the Software.
 
 THE   SOFTWARE  IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 KIND, EXPRESS OR IMPLIED, INCLUDING   BUT NOT LIMITED TO THE
@@ -61,7 +37,6 @@ SOFTWARE  OR THE USE  OR  OTHER  DEALINGS IN   THE SOFTWARE.
 
 using System;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 class Program
 {
@@ -70,6 +45,7 @@ class Program
     const uint TokenQuery = 0x0008;            // Allows querying a token
     const uint SePrivilegeEnabled = 0x0002;    // Enables a privilege
     const uint ShutdownFlags = 0x0001;         // Specifies a shutdown operation
+    const uint MbIconError = 0x00000010;       // Icon for error message in MessageBox
     const string SeShutdownName = "SeShutdownPrivilege"; // Privilege name required for shutdown
 
     // Struct for Local Unique Identifier (LUID) for a privilege
@@ -134,14 +110,14 @@ class Program
         // Open the current process token with permissions to adjust privileges
         if (!OpenProcessToken(GetCurrentProcess(), TokenAdjustPrivileges | TokenQuery, out hToken))
         {
-            MessageBox.Show("Failed to access process token.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox(IntPtr.Zero, "Failed to access process token.", "Error", MbIconError);
             return 1;
         }
 
         // Lookup the LUID for shutdown privilege
         if (!LookupPrivilegeValue(null, SeShutdownName, out luid))
         {
-            MessageBox.Show("Failed to lookup privilege value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox(IntPtr.Zero, "Failed to lookup privilege value.", "Error", MbIconError);
             return 1;
         }
 
@@ -153,14 +129,14 @@ class Program
         // Enable shutdown privilege in the token
         if (!AdjustTokenPrivileges(hToken, false, ref tkp, 0, IntPtr.Zero, 0))
         {
-            MessageBox.Show("Failed to adjust token privileges.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox(IntPtr.Zero, "Failed to adjust token privileges.", "Error", MbIconError);
             return 1;
         }
 
         // Attempt to initiate system shutdown
         if (ExitWindowsEx(ShutdownFlags, 0) == 0)
         {
-            MessageBox.Show("Shutdown cannot be initiated.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox(IntPtr.Zero, "Shuttdown cannot be initiated.", "Error", MbIconError);
             return 1;
         }
 
