@@ -140,20 +140,23 @@ class Program
         {
             MessageBox(IntPtr.Zero, "Invalid number of command line arguments specified.", 
 		       "Error", MbOk | MbIconError);
-            return 1;
+            return 2;
         }
+		
+		// Getting the first argument
+		string arg = args[0];
 
         // Check the length of the first command line argument
-        if (args[0].Length > 2 || !args[0].StartsWith('/'))
+        if (arg.Length > 2 || !arg.StartsWith('/'))
         {
             MessageBox(IntPtr.Zero, "Invalid command line argument specified." +
 		       " Use /s, /r, /a, /l, or /h.", 
 		       "Error", MbOk | MbIconError);
-            return 1;
+            return 2;
         }
 
-        // Convert the first argument to lowercase for case-insensitive comparison
-        char cmdArg = args[0].ToLower()[1]; // Get the character after '/'
+        // Get the character after '/' for case-insensitive comparison
+        char cmdArg = arg.ToLower()[1];
 
         ExitFlags exitFlags; // Variable to hold the desired exit action
 
@@ -180,26 +183,25 @@ class Program
                 MessageBox(IntPtr.Zero, "Invalid command line argument specified. " +
 			   "Use /s, /r, /a, /l, or /h.", 
 			   "Error", MbOk | MbIconError);
-                return 1;
+                return 2;
         }
 
         IntPtr hToken; // Handle to the process token
+        LUID luid; // LUID structure to hold the privilege identifier
 
         // Open the process token with necessary privileges
         if (!OpenProcessToken(GetCurrentProcess(), TokenAdjustPrivileges | TokenQuery, out hToken))
         {
             MessageBox(IntPtr.Zero, "Failed to access process token.", 
 		       "Error", MbOk | MbIconError);
-            return 1;
+            return 3;
         }
-
-        LUID luid; // LUID structure to hold the privilege identifier
 
         // Lookup the LUID for the shutdown privilege
         if (!LookupPrivilegeValue(null, SeShutdownName, out luid))
         {
             MessageBox(IntPtr.Zero, "Failed to lookup privilege value.", "Error", MbOk | MbIconError);
-            return 1;
+            return 3;
         }
 
         TokenPrivileges tkp = new TokenPrivileges(1); // Create a TokenPrivileges structure
@@ -211,7 +213,7 @@ class Program
         {
             MessageBox(IntPtr.Zero, "Failed to adjust token privileges.", 
 		       "Error", MbOk | MbIconError);
-            return 1;
+            return 3;
         }
 
         // Attempt to exit the Windows based on the specified flags
@@ -219,7 +221,7 @@ class Program
         {
             MessageBox(IntPtr.Zero, "Shutdown cannot be initiated.", 
 		       "Error", MbOk | MbIconError);
-            return 1;
+            return 4;
         }
 
         return 0; // Successful execution
