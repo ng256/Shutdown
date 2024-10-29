@@ -86,11 +86,11 @@ def enable_shutdown_privilege():
 
     return True
 
-# Main function to process command line arguments
-def main():
+if __name__ == "__main__":
+
     if len(sys.argv) < 2:
         print("No command line argument specified.")
-        return 1  # Error code for no arguments
+        sys.exit(1)  # Error code for no arguments
 
     argument = sys.argv[1].lower()
     ewx_flags = 0
@@ -108,18 +108,15 @@ def main():
         ewx_flags = EWX_HYBRID_SHUTDOWN  # Hybrid shutdown
     else:
         print("Invalid command line argument.")
-        return 2  # Error code for invalid argument
+        sys.exit(2)  # Error code for invalid argument
 
     # Open the process token with necessary privileges
     if not enable_shutdown_privilege():
-        return 3  # Error code for failure to adjust privileges
+        sys.exit(3)  # Error code for failure to adjust privileges
 
     # Attempt to exit Windows based on the specified flags
     if ctypes.windll.user32.ExitWindowsEx(ewx_flags, 0) == 0:
         print("Shutdown cannot be initiated.")
-        return 4  # Error code for failure to initiate shutdown
+        sys.exit(4)  # Error code for failure to initiate shutdown
 
-    return 0  # Successful execution
-
-if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(0)  # Successful execution
