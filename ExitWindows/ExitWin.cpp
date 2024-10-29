@@ -1,4 +1,17 @@
-/*
+/***********************************************************
+This program allows the user  to perform system shutdown  or 
+reboot  actions.   It  uses  Windows  API  calls  to  adjust 
+privileges and execute the requested action.
+
+Command line  arguments  are  used  to specify  the  desired 
+action:
+
+  - '/s' for shutdown
+  - '/r' for reboot
+  - '/a' for restarting apps
+  - '/l' for logoff
+  - '/h' for hybrid shutdown
+
 Distributed under MIT License:                             
 
 Copyright (c) 2024 Pavel Bashkardin
@@ -10,11 +23,11 @@ Software without restriction,  including without  limitation
 the rights to use, copy, modify, merge, publish, distribute,
 sublicense,  and/or sell copies   of the  Software,   and to
 permit  persons to whom  the Software is furnished to do so,
-subject      to        the       following       conditions:
+subject to the following conditions:
 
 1.  The above copyright  notice and this   permission notice
 shall be included  in  all copies or substantial portions of
-the                                                Software.
+the Software.
 
 2. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 KIND, EXPRESS OR IMPLIED, INCLUDING  BUT NOT LIMITED  TO THE
@@ -24,7 +37,7 @@ OR  COPYRIGHT  HOLDERS  BE LIABLE  FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN  ACTION OF CONTRACT,  TORT OR
 OTHERWISE,  ARISING FROM, OUT OF  OR  IN CONNECTION WITH THE
 SOFTWARE  OR THE  USE   OR OTHER DEALINGS IN   THE SOFTWARE.
-*/
+***********************************************************/
 
 #include <windows.h>      // Windows API header for core functions and data types
 #include <winuser.h>      // Windows User API header for user interface functions
